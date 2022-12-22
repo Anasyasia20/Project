@@ -1,42 +1,46 @@
 import time
-f = open('task2_data.dat', 'r')  #открытие чтение таблицы
-stars = f.read().split('\n')  #считывание её, разделяя по строкам
-entries = []  # создание временного списка
+f = open('task2_data.dat', 'r')  #открытие файла на чтение
+stars = f.read().split('\n')  #считывание файла, разделяя по строкам
+entries = []  # создание временного списка метод для удаления повторяющихся элементов из списка
 for entry in stars:  # перебор всех рядов
     entries.append(entry.split())  # разделяем ряды по пробелам
-entries = entries[1:]  # 1: удаляем первое значение (названия столбцов)
+entries = entries[1:]  # 1: удаляем первое значение (названия столбцов) срез массива выделяем конкретный элемент
 stars = entries  # заменяем изначальный список временным
-entries = []  # обнуляем временный список
+entries = []  # обнуляем временный список, оно полностью не очищает.
+# создает новый список и привязывает его к переменной, но старый список остаются в памяти
 # objects = []  # имена объектов
 # filters = []  # фильтры
-objects = set()
+objects = set() # set создание набора из списка
 filters = set()
 
-# entry = [имя объекта, дата, фильтр, звездная величина] массив
+# entry = [имя объекта, дата, фильтр, звездная величина] массив это список списков
 for entry in stars:
     name = ''  # формируем одинаковое имя
     if len(entry) > 4:  # в имени есть пробел
-        name = entry[0] + ' ' + entry[1]  # первая часть имени, пробел, вторая часть имени
-        entry = [name] + entry[2:]  # обновляем ряд в соответствии с новым именем
+        name = entry[0] + ' ' + entry[1]  # первая часть имени и пробел и вторая часть имени
+        entry = [name] + entry[2:]  # обновляем ряд и добавляем первые 3 элемента
     elif len(entry) < 4:  # ряд не рассматриваем
         continue
     else:
         name = entry[0]
-
+# Оператор ветвления. Если If ложно, то выполняется elif, если и это ложно, то точно выполняется else
     # suhor в одно имя
-    name = name.replace('_', '')
+    name = name.replace('_', '') #способ замены символа
     name = name.replace(' ', '')
-    name = name[:2].upper() + ' ' + name[2:].title() #:срез строки первые два индекса в верхнем регистре снова преобразовываем, suhor => SU Hor
-    entry[0] = name  # обновляем ряд
+    name = name[:2].upper() + ' ' + name[2:].title()
+    #: срез строки первые два индекса в верхнем регистре снова преобразовываем
+    #преобразует первые два индекса элемента в заглавный регистр, suhor => SU Hor
 
-    entry[1] = float('24' + entry[1])  # преобразуем дату и звездную величину в числа из строк
+    entry[0] = name  # обновляем ряд
+    entry[1] = float('24' + entry[1])  # float число в плавающей запятой
+    # преобразуем дату и звездную величину в числа из строк
     entry[3] = float(entry[3])
     # проверяем на новое имя объекта
-    objects.add(entry[0])
+    objects.add(entry[0]) #Метод set add() добавляет заданный элемент в набор
     # проверяем на новый фильтр
     filters.add(entry[2].title())
-    entries.append(entry)  # добавляем элемент в конец списка (entry)добавить элементы списка в другой список метод extend()
-    # , обновляем временный массив
+    entries.append(entry)  # добавляем элемент в конец списка ( элементы списка в другой список методом extend())
+    # обновляем временный массив зачем
 stars = entries  # замена
 entries = []  # обнуление
 
@@ -44,16 +48,15 @@ print('Объекты:', objects)
 print('Фильтры:', filters)
 
 #  3 part
-objects_names = None #ничего не существует
+objects_names = None #ничего не существует ????
 while objects_names not in objects:
     objects_names = input('Введите имя объекта: ') # просим пользователя ввести имя объекта
 
 filters_names = set() #множество
 # intersection - пересечение множеств из множества filters
-while len(filters.intersection(filters_names)) == 0: # проверка равняется ли длина нулю
-    inp = input('Введите фильтр: ')  # то же самое, но с фильтром
-    filters_names = set(inp.split(','))
-
+while len(filters.intersection(filters_names)) == 0: # проверка равняется ли длина нулю (Проверяет равенство значений выражений)
+    i = input('Введите фильтр: ')  # то же самое, но с фильтром
+    filters_names = set(i.split(','))
 filters_names = filters.intersection(filters_names)
 
 # перевод в дни и часы
@@ -104,21 +107,19 @@ for entry in stars:
 
 #создание файла
 
-f = open(f'{objects_names}.dat', 'w')  # создаем файл с нужным именем
+f = open(f'{objects_names}.dat', 'w')  # создаем файл с нужным именем, открытие в режиме записи
 headers = 'Date, HJD, '  # создаем ряд-заголовок
 for filter in filters_names:
     headers = headers + filter + '\n' # добавляем столбцы-фильтры
-
 f.write(headers)  # записываем
 
 data = list(astro.keys())
 data.sort()
 for date in data:
     value = astro[date] #проходит цикл и не записывает прошлые
-    j = value['date'] + '\t' + str(date) + '\t'
+    j = value['date'] + '\t' + str(date) + '\t' # str приводит объект к строке value возвращает объект представления
     for filter in filters_names:
         j = j + str(value[filter]) + '\n'
-
     f.write(j)
 
 
